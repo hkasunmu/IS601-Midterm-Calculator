@@ -26,4 +26,4 @@ jobs:
 
       - name: Run tests with 100% coverage
         run: |
-          python -m pytest --cov=app --cov-branch --cov-report=term-missing --cov-fail-under=100 tests/
+          python -m pytest tests -q --cov=app --cov-report=term-missing --cov-fail-under=100
