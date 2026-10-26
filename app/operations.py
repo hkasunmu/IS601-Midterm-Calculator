@@ -74,7 +74,11 @@ class PercentageOperation(Operation):
                 "Cannot calculate percentage with zero as the second number."
             )
         return (a / b) * 100
-        
+
+class AbsoluteDifferenceOperation(Operation):
+    def execute(self, a, b):
+        return abs(a - b)
+            
 class OperationFactory:
     """Factory that creates operation objects."""
 
@@ -88,6 +92,7 @@ class OperationFactory:
         "modulus": ModulusOperation,
         "int_divide": IntegerDivisionOperation,
         "percent": PercentageOperation,
+        "abs_diff": AbsoluteDifferenceOperation,
 }
 
 
