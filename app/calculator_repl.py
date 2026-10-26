@@ -2,8 +2,6 @@ from app.calculator import Calculator
 from app.exceptions import CalculatorError
 
 class CalculatorREPL:
-    """Command-line interface for the calculator."""
-
     OPERATIONS = {
         "add",
         "subtract",
@@ -11,10 +9,14 @@ class CalculatorREPL:
         "divide",
         "power",
         "root",
+        "modulus",
+        "int_divide",
+        "percent",
+        "abs_diff",
     }
 
-    def __init__(self, calculator=None):
-        self.calculator = calculator or Calculator()
+    def __init__(self, calculator):
+        self.calculator = calculator
 
     def show_help(self):
         """Display available calculator commands."""
@@ -25,6 +27,10 @@ class CalculatorREPL:
         print("  divide NUMBER NUMBER")
         print("  power NUMBER NUMBER")
         print("  root NUMBER NUMBER")
+        print("  modulus NUMBER NUMBER")
+        print("  int_divide NUMBER NUMBER")
+        print("  percent NUMBER NUMBER")
+        print("  abs_diff NUMBER NUMBER")
         print("  history")
         print("  clear")
         print("  undo")
