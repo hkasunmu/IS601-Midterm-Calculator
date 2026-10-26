@@ -52,7 +52,14 @@ class RootOperation(Operation):
 
         return a ** (1 / b)
 
-
+class ModulusOperation(Operation):
+    def execute(self, a, b):
+        if b == 0:
+            raise DivisionByZeroError(
+                "Cannot calculate modulus by zero."
+            )
+        return a % b
+    
 class OperationFactory:
     """Factory that creates operation objects."""
 
@@ -63,6 +70,7 @@ class OperationFactory:
         "divide": DivideOperation,
         "power": PowerOperation,
         "root": RootOperation,
+        "modulus": ModulusOperation,
     }
 
     @classmethod

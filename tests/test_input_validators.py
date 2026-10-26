@@ -31,7 +31,6 @@ def test_validate_number_invalid(value):
     with pytest.raises(InvalidInputError):
         validate_number(value)
 
-
 @pytest.mark.parametrize(
     "operation",
     [
@@ -59,7 +58,7 @@ def test_validate_operation_spaces():
     "operation",
     [
         "fake",
-        "modulus",
+        "not_a_real_operation",
         "plus",
     ],
 )

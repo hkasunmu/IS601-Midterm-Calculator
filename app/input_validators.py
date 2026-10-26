@@ -12,13 +12,17 @@ def validate_number(value):
 def validate_operation(operation):
     """Check that the requested calculator operation is valid."""
     valid_operations = {
-        "add",
-        "subtract",
-        "multiply",
-        "divide",
-        "power",
-        "root",
-    }
+    "add",
+    "subtract",
+    "multiply",
+    "divide",
+    "power",
+    "root",
+    "modulus",
+    "int_divide",
+    "percent",
+    "abs_diff",
+}
 
     operation = operation.lower().strip()
 
