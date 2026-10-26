@@ -67,7 +67,14 @@ class IntegerDivisionOperation(Operation):
                 "Cannot perform integer division by zero."
             )
         return int(a / b)
-    
+class PercentageOperation(Operation):
+    def execute(self, a, b):
+        if b == 0:
+            raise DivisionByZeroError(
+                "Cannot calculate percentage with zero as the second number."
+            )
+        return (a / b) * 100
+        
 class OperationFactory:
     """Factory that creates operation objects."""
 
@@ -80,6 +87,7 @@ class OperationFactory:
         "root": RootOperation,
         "modulus": ModulusOperation,
         "int_divide": IntegerDivisionOperation,
+        "percent": PercentageOperation,
 }
 
 
