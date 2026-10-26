@@ -59,6 +59,14 @@ class ModulusOperation(Operation):
                 "Cannot calculate modulus by zero."
             )
         return a % b
+
+class IntegerDivisionOperation(Operation):
+    def execute(self, a, b):
+        if b == 0:
+            raise DivisionByZeroError(
+                "Cannot perform integer division by zero."
+            )
+        return int(a / b)
     
 class OperationFactory:
     """Factory that creates operation objects."""
@@ -71,7 +79,9 @@ class OperationFactory:
         "power": PowerOperation,
         "root": RootOperation,
         "modulus": ModulusOperation,
-    }
+        "int_divide": IntegerDivisionOperation,
+}
+
 
     @classmethod
     def create_operation(cls, operation_name):
