@@ -89,7 +89,8 @@ class Calculator:
                 record["operand1"],
                 record["operand2"],
                 record["result"],
-            )
+                record.get("timestamp"),
+             )
 
     def calculate(self, operation, operand1, operand2):
         """Perform a calculation."""
