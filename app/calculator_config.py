@@ -9,6 +9,14 @@ class CalculatorConfig:
 
     def __init__(self):
         load_dotenv()
+        self.log_dir = os.getenv(
+    "CALCULATOR_LOG_DIR", "logs"
+        )
+
+        self.log_file = os.getenv(
+    "CALCULATOR_LOG_FILE",
+    os.path.join(self.log_dir, "calculator.log")
+        )
 
         self.history_file = os.getenv(
             "CALCULATOR_HISTORY_FILE",
