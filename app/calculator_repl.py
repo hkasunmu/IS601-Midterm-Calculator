@@ -1,7 +1,20 @@
+
+import sys
+
 from app.calculator import Calculator
 from app.exceptions import CalculatorError
 
+
+def colored(text, color_code):
+    """Add color when the terminal supports it."""
+    if sys.stdout.isatty():
+        return f"\033[{color_code}m{text}\033[0m"
+    return text
+
+
 class CalculatorREPL:
+    """Command-line interface for the advanced calculator."""
+
     OPERATIONS = {
         "add",
         "subtract",
@@ -15,30 +28,32 @@ class CalculatorREPL:
         "abs_diff",
     }
 
-    def __init__(self, calculator):
-        self.calculator = calculator
+    def __init__(self, calculator=None):
+        self.calculator = (
+            calculator if calculator is not None
+            else Calculator()
+        )
 
     def show_help(self):
-        """Display available calculator commands."""
+        """Display all supported calculator commands."""
         print("\nAvailable Commands:")
-        print("  add NUMBER NUMBER")
-        print("  subtract NUMBER NUMBER")
-        print("  multiply NUMBER NUMBER")
-        print("  divide NUMBER NUMBER")
-        print("  power NUMBER NUMBER")
-        print("  root NUMBER NUMBER")
-        print("  modulus NUMBER NUMBER")
-        print("  int_divide NUMBER NUMBER")
-        print("  percent NUMBER NUMBER")
-        print("  abs_diff NUMBER NUMBER")
-        print("  history")
-        print("  clear")
-        print("  undo")
-        print("  redo")
-        print("  save")
-        print("  load")
-        print("  help")
-        print("  exit\n")
+
+        for operation in sorted(self.OPERATIONS):
+            print(f"  {operation} NUMBER NUMBER")
+
+        for command in (
+            "history",
+            "clear",
+            "undo",
+            "redo",
+            "save",
+            "load",
+            "help",
+            "exit",
+        ):
+            print(f"  {command}")
+
+        print()
 
     def show_history(self):
         """Display calculation history."""
@@ -49,8 +64,20 @@ class CalculatorREPL:
         else:
             print(history.to_string(index=False))
 
+    def _log_error(self, error):
+        """Write calculator errors to the log."""
+        logger = getattr(
+            self.calculator, "logger", None
+        )
+
+        if logger is not None:
+            logger.error(
+                "Calculator error: %s", error
+            )
+
     def process_command(self, user_input):
         """Process one command entered by the user."""
+
         user_input = user_input.strip()
 
         if not user_input:
@@ -110,7 +137,12 @@ class CalculatorREPL:
                     parts[2],
                 )
 
-                print(f"Result: {result}")
+                print(
+                    colored(
+                        f"Result: {result}",
+                        "92"
+                    )
+                )
                 return True
 
             print(
@@ -119,12 +151,20 @@ class CalculatorREPL:
             )
 
         except CalculatorError as error:
-            print(f"Error: {error}")
+            self._log_error(error)
+
+            print(
+                colored(
+                    f"Error: {error}",
+                    "91"
+                )
+            )
 
         return True
 
     def run(self):
-        """Start the calculator REPL."""
+        """Run the interactive calculator."""
+
         print("=" * 40)
         print("Enhanced Python Calculator")
         print("=" * 40)
@@ -135,13 +175,25 @@ class CalculatorREPL:
         while running:
             try:
                 user_input = input("calculator> ")
-                running = self.process_command(user_input)
+
+                running = self.process_command(
+                    user_input
+                )
 
             except (KeyboardInterrupt, EOFError):
                 print("\nGoodbye!")
                 break
-            
-            
- 
+
+            except CalculatorError as error:
+                self._log_error(error)
+
+                print(
+                    colored(
+                        f"Error: {error}",
+                        "91"
+                    )
+                )
+
+
 if __name__ == "__main__":  # pragma: no cover
     CalculatorREPL().run()

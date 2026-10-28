@@ -1,4 +1,5 @@
 
+import math
 from abc import ABC, abstractmethod
 
 from app.calculator_config import CalculatorConfig
@@ -7,6 +8,7 @@ from app.calculator_memento import MementoManager
 from app.history import CalculationHistory
 from app.input_validators import validate_number, validate_operation
 from app.operations import OperationFactory
+from app.exceptions import InvalidInputError
 
 
 class CalculatorObserver(ABC):
@@ -39,6 +41,7 @@ class Calculator:
     """Facade that provides a simple interface to the calculator."""
 
     def __init__(self):
+        # Load calculator configuration
         self.config = CalculatorConfig()
 
         # Set up calculator logging
@@ -58,7 +61,7 @@ class Calculator:
         # Set up undo and redo
         self.memento_manager = MementoManager()
 
-        # Register calculator observers
+        # Register observers
         self.observers = [
             AutoSaveObserver(),
             LoggingObserver(),
@@ -90,18 +93,37 @@ class Calculator:
                 record["operand2"],
                 record["result"],
                 record.get("timestamp"),
-             )
+            )
 
     def calculate(self, operation, operand1, operand2):
         """Perform a calculation."""
 
-        # Validate operation and numbers
+        # Validate operation
         operation = validate_operation(operation)
 
+        # Validate numbers
         operand1 = validate_number(operand1)
         operand2 = validate_number(operand2)
 
-        # Save current state for undo
+        # Reject infinite values and NaN
+        if (
+            not math.isfinite(operand1)
+            or not math.isfinite(operand2)
+        ):
+            raise InvalidInputError(
+                "Inputs must be finite numbers."
+            )
+
+        # Check maximum allowed input value
+        if (
+            abs(operand1) > self.config.max_input_value
+            or abs(operand2) > self.config.max_input_value
+        ):
+            raise InvalidInputError(
+                "Input exceeds the maximum allowed value."
+            )
+
+        # Save current state for Undo
         self.memento_manager.save_state(
             self._get_state()
         )
@@ -116,6 +138,8 @@ class Calculator:
             operand1,
             operand2
         )
+        # Round result to configured decimal precision
+        result = round(result, self.config.precision)  
 
         # Save calculation to history
         self.history.add_record(
@@ -125,7 +149,7 @@ class Calculator:
             result,
         )
 
-        # Limit history size
+        # Limit calculation history size
         if len(self.history.history) > self.config.max_history:
             self.history.history = (
                 self.history.history
@@ -133,13 +157,13 @@ class Calculator:
                 .reset_index(drop=True)
             )
 
-        # Log the calculation
+        # Record calculation for logging
         self._log_event = (
             f"Calculation: {operation} "
             f"{operand1}, {operand2} = {result}"
         )
 
-        # Notify logging and auto-save observers
+        # Notify observers
         self._notify_observers()
 
         return result
@@ -157,7 +181,6 @@ class Calculator:
 
         self.history.clear()
 
-        # Log history clearing
         self._log_event = "History cleared"
 
         self._notify_observers()
@@ -173,7 +196,6 @@ class Calculator:
 
         self._restore_state(previous_state)
 
-        # Log undo
         self._log_event = "Undo completed"
 
         self._notify_observers()
@@ -191,7 +213,6 @@ class Calculator:
 
         self._restore_state(next_state)
 
-        # Log redo
         self._log_event = "Redo completed"
 
         self._notify_observers()
