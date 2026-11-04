@@ -195,5 +195,15 @@ class CalculatorREPL:
                 )
 
 
+def main():
+    """Launch the REPL; show a concise message for startup failures."""
+    try:
+        CalculatorREPL().run()
+    except (CalculatorError, OSError) as error:
+        print(f"Unable to start calculator: {error}", file=sys.stderr)
+        return 1
+    return 0
+
+
 if __name__ == "__main__":  # pragma: no cover
-    CalculatorREPL().run()
+    raise SystemExit(main())

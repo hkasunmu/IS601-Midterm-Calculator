@@ -24,6 +24,6 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Run tests with 100% coverage
+      - name: Run tests with minimum 90% coverage
         run: |
           python -m pytest tests -q --cov=app --cov-report=term-missing --cov-fail-under=90

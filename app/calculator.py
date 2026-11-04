@@ -119,11 +119,7 @@ class Calculator:
         self.memento_manager.save_state(self._get_state())
         self.history.add_record(operation, operand1, operand2, result)
 
-        if len(self.history.history) > self.config.max_history:
-            self.history.history = (
-                self.history.history.tail(self.config.max_history)
-                .reset_index(drop=True)
-            )
+        self.history.trim(self.config.max_history)
 
         self._log_event = (
             f"Calculation: {operation} {operand1}, {operand2} = {result}"

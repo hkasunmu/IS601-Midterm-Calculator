@@ -70,10 +70,16 @@ class CalculationHistory:
 
         new_record = pd.DataFrame([record])
 
-        self.history = pd.concat(
-            [self.history, new_record],
-            ignore_index=True
-        )
+        # Keep the object view synchronized with the DataFrame view.
+        calculation = Calculation.from_record(record)
+        if self.history.empty:
+            # Preserve column types without concatenating an empty DataFrame.
+            self.history = new_record.reindex(columns=self.columns)
+        else:
+            self.history = pd.concat(
+                [self.history, new_record], ignore_index=True
+            )
+        self.calculations.append(calculation)
 
     def get_history(self):
         """Return calculation history as a DataFrame."""
@@ -81,12 +87,13 @@ class CalculationHistory:
 
     def get_calculations(self):
         """Return actual Calculation objects."""
-        return [
-            Calculation.from_record(record)
-            for record in self.history.to_dict(
-                orient="records"
-            )
-        ]
+        return list(self.calculations)
+
+    def trim(self, maximum):
+        """Keep only the most recent calculations in both representations."""
+        if len(self.history) > maximum:
+            self.history = self.history.tail(maximum).reset_index(drop=True)
+            self.calculations = self.calculations[-maximum:]
 
     def clear(self):
         """Clear calculation history."""

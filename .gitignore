@@ -9,3 +9,4 @@ htmlcov/
 .env
 calculation_history.csv
 logs/
+*.bak
