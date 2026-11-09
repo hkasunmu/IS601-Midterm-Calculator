@@ -51,6 +51,8 @@ class Calculator:
         )
         try:
             self.history.load()
+            # Enforce the configured size on existing CSV history at startup.
+            self.history.trim(self.config.max_history)
         except HistoryError as error:
             # A damaged or unreadable history must not prevent startup.
             self.logger.warning("Could not load history; starting empty: %s", error)
@@ -161,5 +163,7 @@ class Calculator:
         self.history.save()
 
     def load(self):
-        """Load calculation history from CSV."""
-        return self.history.load()
+        """Load the newest configured number of CSV records."""
+        self.history.load()
+        self.history.trim(self.config.max_history)
+        return self.history.get_history()
